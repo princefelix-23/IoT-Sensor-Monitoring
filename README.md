@@ -24,18 +24,4 @@ graph LR
 
     %% Stream Analytics processing and storage
     ASA -->|5-min Aggregated Data| BS
-
-    %% Add styling
-    classDef sensor fill:#D4E6F1,stroke:#2874A6,stroke-width:2px
-    classDef azure fill:#D4F1E6,stroke:#196F3D,stroke-width:2px
-    classDef storage fill:#F1E6D4,stroke:#935116,stroke-width:2px
-
-    class S1,S2,S3 sensor
-    class IH,ASA azure
-    class BS storage
-
-    %% Add labels for data types with darker colors
-    linkStyle 0,1,2 stroke:#2874A6,stroke-width:2px
-    linkStyle 3 stroke:#196F3D,stroke-width:2px
-    linkStyle 4 stroke:#935116,stroke-width:2px
 ```
