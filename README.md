@@ -425,13 +425,13 @@ Sample outputs are available in the `screenshots/` directory.
 ├── README.md
 ├── sensor-simulation/
 │   ├── all-in-one-skateway-sensor.py
-│   ├── .env
-│   └── requirements.txt
+|── .env
+│── requirements.txt
 ├── screenshots/
-│   ├── architecture_diagram.png
-│   ├── iot_hub_configuration.png
-│   ├── stream_analytics_settings.png
-│   ├── blob_storage_outputs.png
+│   ├── Azure Blob Storage/
+│   ├── Azure IoTHub/
+│   ├── Azure Stream Analytics/
+
 ```
 
 ---
