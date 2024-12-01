@@ -125,7 +125,7 @@ The processed data is stored in the following structure:
    ```
 3. Install dependencies:
    ```bash
-   pip install azure-iot-device python-dotenv
+   pip install -r requirement.txt
    ```
 4. Run the script:
    ```bash
@@ -185,7 +185,7 @@ Sample outputs are available in the `screenshots/` directory.
 ├── README.md
 ├── sensor-simulation/
 │   ├── all-in-one-skateway-sensor.py
-│   ├── .env (example only, not included in repo)
+│   ├── .env
 │   └── requirements.txt
 ├── screenshots/
 │   ├── architecture_diagram.png
