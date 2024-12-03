@@ -43,23 +43,6 @@ graph LR
 
 ## Implementation Details
 
-#### 1. Create the IoT Hub
-
-1.  In the Azure Portal, search for IoT Hub and click Create to create the IoT Hub.
-2.  Provide a name, select a resource group, choose a region, and select the Free Tier to keep costs low. Click Review + Create and then Create.
-
-#### 2. Register a Device
-
-1.  Add Device to register a new device. This device is used to send data to the IoT Hub.
-2.  Click the device and copy the connection string whcih will be use in the script.
-
-#### 3. Message routing (Optionally)
-
-1. Go to the IoT Hub and click Message Routing
-2. Deinfe the endpoint (Storage) and choose your contianer
-3. Pick a preferred file format and set your file name format
-4. Create a route, and add a query to filter data before routing it to the endpoint
-
 ### IoT Sensor Simulation
 
 The all-in-one-skateway-sensor.py script simulates IoT sensors at three locations: Dow's Lake, Fifth Avenue, and NAC. Each sensor generates telemetry data every 10 seconds and sends it to Azure IoT Hub.
@@ -76,7 +59,7 @@ The process is broken down into the following steps:
 
    ```json
    {
-     "location": <location>,
+     "location": "<location>",
      "iceThickness": 27,
      "surfaceTemperature": -1,
      "snowAccumulation": 8,
@@ -91,7 +74,7 @@ The process is broken down into the following steps:
 6. **Send Data**: Each JSON payload is wrapped in a Message object and sent to the IoT Hub.
 7. **Repeat**: Continuously sends data every 10 seconds.
 
-#### Libraries Used in the Script
+### Libraries Used in the Script
 
 - **azure.iot.device**
 - **dotenv**
@@ -103,7 +86,7 @@ To install the required external libraries, run:
 pip install -r requirements.txt
 ```
 
-#### Python Script to Simulate Sensor Data
+### Python Script to Simulate Sensor Data
 
 ```python
 import time
@@ -113,25 +96,15 @@ from azure.iot.device import IoTHubDeviceClient, Message
 from datetime import datetime
 from dotenv import load_dotenv
 
-# This script simulates sensor data for three Rideau Canal locations (Dow's Lake, Fifth Avenue, NAC)
-# and sends updates every 10 seconds to Azure IoT Hub, monitoring ice thickness, temperature, and snow conditions
 
-#Load dotenv
 load_dotenv()
 
-
-# Intialize a connection strings map <location, Connection String>
-# The connection string must be stored in a .env file
-# install dotenv package then use os.getenv(<keyname>) to access your KEY
 CONNECTION_STRINGS = {
     "Dow's Lake": os.getenv('DL_CONNECTION_STRING'),
     "Fifth Avenue": os.getenv('FA_CONNECTION_STRING'),
     "NAC": os.getenv('NAC_CONNECTION_STRING')
 }
 
-# Generates simulated telemetry data for a given location on the Rideau Canal,
-# Data includes ice thickness, surface temperature, snow accumulation, external temperature, and a timestamp.
-# Generate random range from actual expected number for each data
 def get_telemetry(location):
     return {
         "location": location,
@@ -143,7 +116,6 @@ def get_telemetry(location):
     }
 
 def main():
-    # Create IoT Hub clients for each location using for loops
     clients = {
         location: IoTHubDeviceClient.create_from_connection_string(conn_str)
         for location, conn_str in CONNECTION_STRINGS.items()
@@ -151,24 +123,24 @@ def main():
 
     print("Sending telemetry to IoT Hub...")
     try:
-        while True: #Infinite loop
-            for location, client in clients.items(): # For each client (sensor) take the location name
-                telemetry = get_telemetry(location) # set telemtry for the location
-                message = Message(str(telemetry)) # create the message to process
-                client.send_message(message) # send the message containing data for the location
+        while True:
+            for location, client in clients.items():
+                telemetry = get_telemetry(location)
+                message = Message(str(telemetry))
+                client.send_message(message)
                 print(f"Sent message from {location}: {message}")
-            time.sleep(10) # Send evrty 10 seconds
+            time.sleep(10)
     except KeyboardInterrupt:
         print("Stopped sending messages.")
     finally:
-        for client in clients.values(): # Disconnect each connection using for loops
+        for client in clients.values():
             client.disconnect()
 
 if __name__ == "__main__":
     main()
 ```
 
-#### Setting Up the .env File
+### Setting Up the .env File
 
 Create a `.env` file in the root directory of your project and add the following content:
 
@@ -182,6 +154,110 @@ Create a `.env` file in the root directory of your project and add the following
   FA_CONNECTION_STRING=<device-connection-string>
   NAC_CONNECTION_STRING=<device-connection-string>
   ```
+
+### In Depth Script Explanation
+
+#### 1. **Importing Required Modules**
+
+```python
+import time
+import random
+import os
+from azure.iot.device import IoTHubDeviceClient, Message
+from datetime import datetime
+from dotenv import load_dotenv
+```
+
+- **`time`**: Controls the frequency of telemetry data transmission (every 10 seconds).
+- **`random`**: Generates random values to simulate realistic sensor readings.
+- **`os`**: Accesses environment variables (connection strings) stored in a `.env` file.
+- **`IoTHubDeviceClient`**: Facilitates communication with Azure IoT Hub.
+- **`Message`**: Wraps telemetry data to prepare it for transmission to IoT Hub.
+- **`datetime`**: Generates timestamps for the telemetry data in UTC format.
+- **`load_dotenv`**: Loads environment variables from a `.env` file for secure configuration.
+
+---
+
+#### 2. **Loading Configuration**
+
+```python
+CONNECTION_STRINGS = {
+    "Dow's Lake": os.getenv('DL_CONNECTION_STRING'),
+    "Fifth Avenue": os.getenv('FA_CONNECTION_STRING'),
+    "NAC": os.getenv('NAC_CONNECTION_STRING')
+}
+```
+- **`CONNECTION_STRINGS`**:
+  - A dictionary mapping each location to its corresponding IoT Hub connection string.
+
+---
+
+#### 3. **Telemetry Data**
+
+```python
+def get_telemetry(location):
+    return {
+        "location": location,
+        "iceThickness": random.uniform(20, 40),
+        "surfaceTemperature": random.uniform(-15, 0),
+        "snowAccumulation": random.uniform(5, 20),
+        "externalTemperature": random.uniform(-25, 5),
+        "timestamp": datetime.utcnow().isoformat() + "Z"
+    }
+```
+
+- **`get_telemetry(location)`**:
+  - Generates telemetry data for a specified location with random values for:
+    - **Ice Thickness**: Random value between 20 cm and 40 cm.
+    - **Surface Temperature**: Random value between -15°C and 0°C.
+    - **Snow Accumulation**: Random value between 5 cm and 20 cm.
+    - **External Temperature**: Random value between -25°C and 5°C.
+    - **Timestamp**: Current UTC time in ISO 8601 format.
+
+---
+
+#### 4. **Creating IoT Hub Clients**
+
+```python
+clients = {
+    location: IoTHubDeviceClient.create_from_connection_string(conn_str)
+    for location, conn_str in CONNECTION_STRINGS.items()
+}
+```
+
+- Initializes an `IoTHubDeviceClient` instance for each location using its unique connection string.
+
+---
+
+#### 6. **Sending Telemetry Data**
+
+```python
+while True:
+    for location, client in clients.items():
+        telemetry = get_telemetry(location)
+        message = Message(str(telemetry))
+        client.send_message(message)
+        print(f"Sent message from {location}: {message}")
+    time.sleep(10)
+```
+
+- **Infinite Loop**: Continuously sends telemetry data every 10 seconds.
+
+---
+
+#### 7. **Graceful Shutdown**
+
+```python
+except KeyboardInterrupt:
+    print("Stopped sending messages.")
+finally:
+    for client in clients.values():
+        client.disconnect()
+```
+
+- Ensures proper cleanup by disconnecting all IoT Hub clients when interrupted.
+
+---
 
 ### Azure IoT Hub Configuration
 
